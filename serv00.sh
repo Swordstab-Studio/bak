@@ -1171,8 +1171,6 @@ green "当前Argo固定域名：$argogd $check"
 fi
 if [ ! -f "$WORKDIR/boot.log" ] && ! ps aux | grep [t]oken > /dev/null; then
 yellow "当前Argo固定域名：$(cat $WORKDIR/gdym.log 2>/dev/null)，请检查相关参数是否输入有误，建议卸载重装"
-else
-red "未安装sing-box，请选择 1 进行安装" 
 fi
 curl -sSL https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/serv00.sh -o serv00.sh && chmod +x serv00.sh
    echo   "========================================================="
