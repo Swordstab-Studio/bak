@@ -124,16 +124,17 @@ fi
 export vless_port=$tcp_port1
 export vmess_port=$tcp_port2
 export hy2_port=$udp_port
-green "你的vless-reality端口为: $vless_port"
-green "你的vmess端口为: $vmess_port"
-green "你的hysteria2端口为: $hy2_port"
+green "你的vless-reality端口: $vless_port"
+green "你的vmess-ws端口(设置Argo固定域名端口): $vmess_port"
+green "你的hysteria2端口: $hy2_port"
+sleep 2
 }
 
 install_singbox() {
 if [[ -e $WORKDIR/list.txt ]]; then
 yellow "已安装sing-box，请先选择2卸载，再执行安装" && exit
 fi
-yellow "为确保节点可用性，不必在Serv00网页设置3个端口，脚本会随机生成"
+yellow "为确保节点可用性，建议在Serv00网页不设置端口，脚本会随机生成有效端口"
 sleep 2
         cd $WORKDIR
 	echo
@@ -163,6 +164,7 @@ uninstall_singbox() {
        [Yy])
           bash -c 'ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk "{print \$2}" | xargs -r kill -9 >/dev/null 2>&1' >/dev/null 2>&1
           rm -rf domains serv00.sh serv00keep.sh
+	  rm -rf /usr/home/${USERNAME}/domains/${USERNAME}.serv00.net/public_html/*
 	  crontab -l | grep -v "serv00keep" >rmcron
           crontab rmcron >/dev/null 2>&1
           rm rmcron
@@ -182,6 +184,7 @@ reading "\n清理所有进程并清空所有安装内容，将退出ssh连接，
     crontab -l | grep -v "serv00keep" >rmcron
     crontab rmcron >/dev/null 2>&1
     rm rmcron
+    rm -rf /usr/home/${USERNAME}/domains/${USERNAME}.serv00.net/public_html/*
     find ~ -type f -exec chmod 644 {} \; 2>/dev/null
     find ~ -type d -exec chmod 755 {} \; 2>/dev/null
     find ~ -type f -exec rm -f {} \; 2>/dev/null
@@ -198,7 +201,7 @@ argo_configure() {
   while true; do
     yellow "方式一：Argo临时隧道 (无需域名，推荐)"
     yellow "方式二：Argo固定隧道 (需要域名，需要CF设置提取Token)"
-    echo -e "${red}注意：${purple}Argo固定隧道使用Token时，需要在cloudflare后台设置隧道端口，该端口必须与vmess-ws的tcp端口一致)${re}"
+    echo -e "${red}注意：${purple}Argo固定隧道使用Token时，需要在cloudflare后台设置隧道端口，该端口必须与vmess-ws的tcp端口 $vmess_port 一致)${re}"
     reading "输入 g 表示使用Argo固定隧道，回车跳过表示使用Argo临时隧道 【请选择 g 或者 回车】: " argo_choice
     if [[ "$argo_choice" != "g" && "$argo_choice" != "G" && -n "$argo_choice" ]]; then
         red "无效的选择，请输入 g 或回车"
@@ -523,68 +526,6 @@ hy2_link="hysteria2://$UUID@$IP:$hy2_port?sni=www.bing.com&alpn=h3&insecure=1#$N
 echo "$hy2_link" >> jh.txt
 url=$(cat jh.txt 2>/dev/null)
 baseurl=$(echo -e "$url" | base64 -w 0)
-echo
-sleep 2
-cat > list.txt <<EOF
-=================================================================================================
-
-一、Vless-reality分享链接如下：
-$vl_link
-
-注意：如果之前输入的reality域名为CF域名，将激活以下功能：
-可应用在 https://github.com/yonggekkk/Cloudflare_vless_trojan 项目中创建CF vless/trojan 节点
-1、Proxyip(带端口)信息如下：
-方式一全局应用：设置变量名：proxyip    设置变量值：$IP:$vless_port  
-方式二单节点应用：path路径改为：/pyip=$IP:$vless_port
-CF节点的TLS可开可关
-CF节点落地到CF网站的地区为：$IP所在地区
-
-2、非标端口反代IP信息如下：
-客户端优选IP地址为：$IP，端口：$vless_port
-CF节点的TLS必须开启
-CF节点落地到非CF网站的地区为：$IP所在地区
-
-注：如果serv00的IP被墙，proxyip依旧有效，但用于客户端地址与端口的非标端口反代IP将不可用
-注：可能有大佬会扫Serv00的反代IP作为其共享IP库或者出售，请慎重将reality域名设置为CF域名
--------------------------------------------------------------------------------------------------
-
-
-二、Vmess-ws分享链接三形态如下：
-
-1、Vmess-ws主节点分享链接如下：
-(该节点默认不支持CDN，如果设置为CDN回源(需域名)：客户端地址可自行修改优选IP/域名，7个80系端口随便换，被墙依旧能用！)
-$vmws_link
-
-Argo域名：${argodomain}
-如果上面Argo临时域名未生成，以下 2 与 3 的Argo节点将不可用 (打开Argo固定/临时域名网页，显示HTTP ERROR 404说明正常可用)
-
-2、Vmess-ws-tls_Argo分享链接如下： 
-(该节点为CDN优选IP节点，客户端地址可自行修改优选IP/域名，6个443系端口随便换，被墙依旧能用！)
-$vmatls_link
-
-3、Vmess-ws_Argo分享链接如下：
-(该节点为CDN优选IP节点，客户端地址可自行修改优选IP/域名，7个80系端口随便换，被墙依旧能用！)
-$vma_link
--------------------------------------------------------------------------------------------------
-
-
-三、HY2分享链接如下：
-$hy2_link
--------------------------------------------------------------------------------------------------
-
-
-四、以上五个节点的聚合通用分享链接如下：
-$baseurl
--------------------------------------------------------------------------------------------------
-
-
-五、查看sing-box与clash-meta的订阅配置文件，请进入主菜单选择4
--------------------------------------------------------------------------------------------------
-
-=================================================================================================
-
-EOF
-cat list.txt
 
 cat > sing_box.json <<EOF
 {
@@ -1014,7 +955,7 @@ proxies:
       Host: $argodomain 
 
 proxy-groups:
-- name: 负载均衡
+- name: Balance
   type: load-balance
   url: https://www.gstatic.com/generate_204
   interval: 300
@@ -1026,7 +967,7 @@ proxy-groups:
     - vmess-tls-argo-$NAME
     - vmess-argo-$NAME
 
-- name: 自动选择
+- name: Auto
   type: url-test
   url: https://www.gstatic.com/generate_204
   interval: 300
@@ -1038,11 +979,11 @@ proxy-groups:
     - vmess-tls-argo-$NAME
     - vmess-argo-$NAME
     
-- name: 🌍选择代理节点
+- name: Select
   type: select
   proxies:
-    - 负载均衡                                         
-    - 自动选择
+    - Balance                                         
+    - Auto
     - DIRECT
     - vless-reality-vision-$NAME                              
     - vmess-ws-$NAME
@@ -1052,9 +993,88 @@ proxy-groups:
 rules:
   - GEOIP,LAN,DIRECT
   - GEOIP,CN,DIRECT
-  - MATCH,🌍选择代理节点
+  - MATCH,Select
   
 EOF
+
+sleep 2
+FILE_PATH="/usr/home/${USERNAME}/domains/${USERNAME}.serv00.net/public_html"
+[ -d "$FILE_PATH" ] || mkdir -p "$FILE_PATH"
+echo "$baseurl" > ${FILE_PATH}/${USERNAME}_v2sub.txt
+cat clash_meta.yaml > ${FILE_PATH}/${USERNAME}_clashmeta.txt
+cat sing_box.json > ${FILE_PATH}/${USERNAME}_singbox.txt
+V2rayN_LINK="https://${USERNAME}.serv00.net/${USERNAME}_v2sub.txt"
+Clashmeta_LINK="https://${USERNAME}.serv00.net/${USERNAME}_clashmeta.txt"
+Singbox_LINK="https://${USERNAME}.serv00.net/${USERNAME}_singbox.txt"
+cat > list.txt <<EOF
+=================================================================================================
+
+一、Vless-reality分享链接如下：
+$vl_link
+
+注意：如果之前输入的reality域名为CF域名，将激活以下功能：
+可应用在 https://github.com/yonggekkk/Cloudflare_vless_trojan 项目中创建CF vless/trojan 节点
+1、Proxyip(带端口)信息如下：
+方式一全局应用：设置变量名：proxyip    设置变量值：$IP:$vless_port  
+方式二单节点应用：path路径改为：/pyip=$IP:$vless_port
+CF节点的TLS可开可关
+CF节点落地到CF网站的地区为：$IP所在地区
+
+2、非标端口反代IP信息如下：
+客户端优选IP地址为：$IP，端口：$vless_port
+CF节点的TLS必须开启
+CF节点落地到非CF网站的地区为：$IP所在地区
+
+注：如果serv00的IP被墙，proxyip依旧有效，但用于客户端地址与端口的非标端口反代IP将不可用
+注：可能有大佬会扫Serv00的反代IP作为其共享IP库或者出售，请慎重将reality域名设置为CF域名
+-------------------------------------------------------------------------------------------------
+
+
+二、Vmess-ws分享链接三形态如下：
+
+1、Vmess-ws主节点分享链接如下：
+(该节点默认不支持CDN，如果设置为CDN回源(需域名)：客户端地址可自行修改优选IP/域名，7个80系端口随便换，被墙依旧能用！)
+$vmws_link
+
+Argo域名：${argodomain}
+如果上面Argo临时域名未生成，以下 2 与 3 的Argo节点将不可用 (打开Argo固定/临时域名网页，显示HTTP ERROR 404说明正常可用)
+
+2、Vmess-ws-tls_Argo分享链接如下： 
+(该节点为CDN优选IP节点，客户端地址可自行修改优选IP/域名，6个443系端口随便换，被墙依旧能用！)
+$vmatls_link
+
+3、Vmess-ws_Argo分享链接如下：
+(该节点为CDN优选IP节点，客户端地址可自行修改优选IP/域名，7个80系端口随便换，被墙依旧能用！)
+$vma_link
+-------------------------------------------------------------------------------------------------
+
+
+三、HY2分享链接如下：
+$hy2_link
+-------------------------------------------------------------------------------------------------
+
+
+四、以上五个节点的聚合通用订阅分享链接如下：
+$V2rayN_LINK
+
+五个节点聚合通用分享码：
+$baseurl
+-------------------------------------------------------------------------------------------------
+
+
+五、查看Sing-box与Clash-meta的订阅配置文件，请进入主菜单选择4
+
+Clash-meta订阅分享链接：
+$Clashmeta_LINK
+
+Sing-box订阅分享链接：
+$Singbox_LINK
+-------------------------------------------------------------------------------------------------
+
+=================================================================================================
+
+EOF
+cat list.txt
 sleep 2
 rm -rf sb.log core tunnel.yml tunnel.json fake_useragent_0.2.0.json
 }
@@ -1086,7 +1106,29 @@ red "未安装sing-box" && exit
 fi
 }
 
-
+servkeep() {
+green "安装进程保活"
+curl -sSL https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/serv00keep.sh -o serv00keep.sh && chmod +x serv00keep.sh
+sed -i '' -e "14s|''|'$UUID'|" serv00keep.sh
+sed -i '' -e "17s|''|'$vless_port'|" serv00keep.sh
+sed -i '' -e "18s|''|'$vmess_port'|" serv00keep.sh
+sed -i '' -e "19s|''|'$hy2_port'|" serv00keep.sh
+sed -i '' -e "20s|''|'$IP'|" serv00keep.sh
+sed -i '' -e "21s|''|'$reym'|" serv00keep.sh
+if [ ! -f "$WORKDIR/boot.log" ]; then
+sed -i '' -e "15s|''|'${ARGO_DOMAIN}'|" serv00keep.sh
+sed -i '' -e "16s|''|'${ARGO_AUTH}'|" serv00keep.sh
+fi
+if ! crontab -l 2>/dev/null | grep -q 'serv00keep'; then
+if [ -f "$WORKDIR/boot.log" ] || grep -q "trycloudflare.com" "$WORKDIR/boot.log" 2>/dev/null; then
+check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [l]ocalhost > /dev/null"
+else
+check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [t]oken > /dev/null"
+fi
+(crontab -l 2>/dev/null; echo "*/2 * * * * if $check_process; then /bin/bash serv00keep.sh; fi") | crontab -
+fi
+green "主进程+Argo进程保活安装完毕，默认每2分钟执行一次，运行 crontab -e 可自行修改保活执行间隔" && sleep 2
+}
 
 okip(){
     IP_LIST=($(devil vhost list | awk '/^[0-9]+/ {print $1}'))
@@ -1112,6 +1154,15 @@ okip(){
 #主菜单
 menu() {
    clear
+   echo "========================================================="
+   purple "修改自Serv00|ct8老王sing-box安装脚本"
+   purple "转载请著名出自老王，请勿滥用"
+   green "甬哥Github项目  ：github.com/yonggekkk"
+   green "甬哥Blogger博客 ：ygkkk.blogspot.com"
+   green "甬哥YouTube频道 ：www.youtube.com/@ygkkk"
+   green "一键三协议共存：vless-reality、Vmess-ws(Argo)、hysteria2"
+   green "当前脚本版本：V25.1.23  快捷方式：bash serv00.sh"
+   echo "========================================================="
    green  "1. 安装sing-box"
    echo   "---------------------------------------------------------"
    red    "2. 卸载sing-box"
@@ -1170,7 +1221,22 @@ checkhttp=$(curl --max-time 2 -o /dev/null -s -w "%{http_code}\n" "https://$argo
 green "当前Argo固定域名：$argogd $check"
 fi
 if [ ! -f "$WORKDIR/boot.log" ] && ! ps aux | grep [t]oken > /dev/null; then
-yellow "当前Argo固定域名：$(cat $WORKDIR/gdym.log 2>/dev/null)，请检查相关参数是否输入有误，建议卸载重装"
+yellow "当前Argo固定域名：$(cat $WORKDIR/gdym.log 2>/dev/null)，启用失败，请检查相关参数是否输入有误"
+fi
+if ! crontab -l 2>/dev/null | grep -q 'serv00keep'; then
+if [ -f "$WORKDIR/boot.log" ] || grep -q "trycloudflare.com" "$WORKDIR/boot.log" 2>/dev/null; then
+check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [l]ocalhost > /dev/null"
+else
+check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [t]oken > /dev/null"
+fi
+(crontab -l 2>/dev/null; echo "*/2 * * * * if $check_process; then /bin/bash serv00keep.sh; fi") | crontab -
+yellow "发现Cron保活可能被重置清空！现已修复成功！"
+yellow "主进程与Argo进程启动中…………2分钟后可再次进入脚本查看"
+else
+green "Cron保活运行正常"
+fi
+else
+red "未安装sing-box，请选择 1 进行安装" 
 fi
 curl -sSL https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/serv00.sh -o serv00.sh && chmod +x serv00.sh
    echo   "========================================================="
