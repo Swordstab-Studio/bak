@@ -150,9 +150,6 @@ sleep 2
         argo_configure
 	echo
         download_and_run_singbox
-	cd
-	echo
-	servkeep
         cd $WORKDIR
         echo
         get_links
@@ -163,11 +160,8 @@ uninstall_singbox() {
     case "$choice" in
        [Yy])
           bash -c 'ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk "{print \$2}" | xargs -r kill -9 >/dev/null 2>&1' >/dev/null 2>&1
-          rm -rf domains serv00.sh serv00keep.sh
+          rm -rf domains serv00.sh
 	  rm -rf /usr/home/${USERNAME}/domains/${USERNAME}.serv00.net/public_html/*
-	  crontab -l | grep -v "serv00keep" >rmcron
-          crontab rmcron >/dev/null 2>&1
-          rm rmcron
           clear
           green "已完全卸载"
           ;;
@@ -181,9 +175,6 @@ reading "\n清理所有进程并清空所有安装内容，将退出ssh连接，
   case "$choice" in
     [Yy]) 
     bash -c 'ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk "{print \$2}" | xargs -r kill -9 >/dev/null 2>&1' >/dev/null 2>&1
-    crontab -l | grep -v "serv00keep" >rmcron
-    crontab rmcron >/dev/null 2>&1
-    rm rmcron
     rm -rf /usr/home/${USERNAME}/domains/${USERNAME}.serv00.net/public_html/*
     find ~ -type f -exec chmod 644 {} \; 2>/dev/null
     find ~ -type d -exec chmod 755 {} \; 2>/dev/null
@@ -240,8 +231,6 @@ download_and_run_singbox() {
   ARCH=$(uname -m) && DOWNLOAD_DIR="." && mkdir -p "$DOWNLOAD_DIR" && FILE_INFO=()
   if [ "$ARCH" == "arm" ] || [ "$ARCH" == "arm64" ] || [ "$ARCH" == "aarch64" ]; then
       FILE_INFO=("https://github.com/eooce/test/releases/download/arm64/sb web" "https://github.com/eooce/test/releases/download/arm64/bot13 bot")
-  elif [ "$ARCH" == "amd64" ] || [ "$ARCH" == "x86_64" ] || [ "$ARCH" == "x86" ]; then
-      FILE_INFO=("https://github.com/yonggekkk/Cloudflare_vless_trojan/releases/download/serv00/sb web" "https://github.com/yonggekkk/Cloudflare_vless_trojan/releases/download/serv00/server bot")
   else
       echo "Unsupported architecture: $ARCH"
       exit 1
@@ -1200,7 +1189,7 @@ fi
 else
 red "未安装sing-box，请选择 1 进行安装" 
 fi
-curl -sSL https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/serv00.sh -o serv00.sh && chmod +x serv00.sh
+curl -sSL https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/serv00.sh -o serv00.sh && chmod +x serv00.sh
    echo   "========================================================="
    reading "请输入选择【0-5】: " choice
    echo ""
