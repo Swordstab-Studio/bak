@@ -1112,15 +1112,6 @@ okip(){
 #主菜单
 menu() {
    clear
-   echo "========================================================="
-   purple "修改自Serv00|ct8老王sing-box安装脚本"
-   purple "转载请著名出自老王，请勿滥用"
-   green "甬哥Github项目  ：github.com/yonggekkk"
-   green "甬哥Blogger博客 ：ygkkk.blogspot.com"
-   green "甬哥YouTube频道 ：www.youtube.com/@ygkkk"
-   green "一键三协议共存：vless-reality、Vmess-ws(Argo)、hysteria2"
-   green "当前脚本版本：V25.1.22  快捷方式：bash serv00.sh"
-   echo "========================================================="
    green  "1. 安装sing-box"
    echo   "---------------------------------------------------------"
    red    "2. 卸载sing-box"
@@ -1180,19 +1171,6 @@ green "当前Argo固定域名：$argogd $check"
 fi
 if [ ! -f "$WORKDIR/boot.log" ] && ! ps aux | grep [t]oken > /dev/null; then
 yellow "当前Argo固定域名：$(cat $WORKDIR/gdym.log 2>/dev/null)，请检查相关参数是否输入有误，建议卸载重装"
-fi
-if ! crontab -l 2>/dev/null | grep -q 'serv00keep'; then
-if [ -f "$WORKDIR/boot.log" ] || grep -q "trycloudflare.com" "$WORKDIR/boot.log" 2>/dev/null; then
-check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [l]ocalhost > /dev/null"
-else
-check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [t]oken > /dev/null"
-fi
-(crontab -l 2>/dev/null; echo "*/2 * * * * if $check_process; then /bin/bash serv00keep.sh; fi") | crontab -
-yellow "发现Cron保活可能被重置清空！现已修复成功！"
-yellow "主进程与Argo进程启动中…………2分钟后可再次进入脚本查看"
-else
-green "Cron保活运行正常"
-fi
 else
 red "未安装sing-box，请选择 1 进行安装" 
 fi
