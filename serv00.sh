@@ -1106,29 +1106,7 @@ red "未安装sing-box" && exit
 fi
 }
 
-servkeep() {
-green "安装进程保活"
-curl -sSL https://raw.githubusercontent.com/yonggekkk/sing-box-yg/main/serv00keep.sh -o serv00keep.sh && chmod +x serv00keep.sh
-sed -i '' -e "14s|''|'$UUID'|" serv00keep.sh
-sed -i '' -e "17s|''|'$vless_port'|" serv00keep.sh
-sed -i '' -e "18s|''|'$vmess_port'|" serv00keep.sh
-sed -i '' -e "19s|''|'$hy2_port'|" serv00keep.sh
-sed -i '' -e "20s|''|'$IP'|" serv00keep.sh
-sed -i '' -e "21s|''|'$reym'|" serv00keep.sh
-if [ ! -f "$WORKDIR/boot.log" ]; then
-sed -i '' -e "15s|''|'${ARGO_DOMAIN}'|" serv00keep.sh
-sed -i '' -e "16s|''|'${ARGO_AUTH}'|" serv00keep.sh
-fi
-if ! crontab -l 2>/dev/null | grep -q 'serv00keep'; then
-if [ -f "$WORKDIR/boot.log" ] || grep -q "trycloudflare.com" "$WORKDIR/boot.log" 2>/dev/null; then
-check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [l]ocalhost > /dev/null"
-else
-check_process="! ps aux | grep '[c]onfig' > /dev/null || ! ps aux | grep [t]oken > /dev/null"
-fi
-(crontab -l 2>/dev/null; echo "*/2 * * * * if $check_process; then /bin/bash serv00keep.sh; fi") | crontab -
-fi
-green "主进程+Argo进程保活安装完毕，默认每2分钟执行一次，运行 crontab -e 可自行修改保活执行间隔" && sleep 2
-}
+
 
 okip(){
     IP_LIST=($(devil vhost list | awk '/^[0-9]+/ {print $1}'))
@@ -1154,15 +1132,6 @@ okip(){
 #主菜单
 menu() {
    clear
-   echo "========================================================="
-   purple "修改自Serv00|ct8老王sing-box安装脚本"
-   purple "转载请著名出自老王，请勿滥用"
-   green "甬哥Github项目  ：github.com/yonggekkk"
-   green "甬哥Blogger博客 ：ygkkk.blogspot.com"
-   green "甬哥YouTube频道 ：www.youtube.com/@ygkkk"
-   green "一键三协议共存：vless-reality、Vmess-ws(Argo)、hysteria2"
-   green "当前脚本版本：V25.1.23  快捷方式：bash serv00.sh"
-   echo "========================================================="
    green  "1. 安装sing-box"
    echo   "---------------------------------------------------------"
    red    "2. 卸载sing-box"
