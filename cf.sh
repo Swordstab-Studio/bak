@@ -66,11 +66,11 @@ fi
 if [ ! -e location.json ]; then
 curl -s -o location.json https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/location.json
 fi
-if [ ! -e v4.txt ]; then
-curl -s -o v4.txt https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/v4.txt
+if [ ! -e ips-v4.txt ]; then
+curl -s -o ips-v4.txt https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/ips-v4.txt
 fi
-if [ ! -e v6.txt ]; then
-curl -s -o v6.txt https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/v6.txt
+if [ ! -e ips-v6.txt ]; then
+curl -s -o ips-v6.txt https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/ips-v6.txt
 fi
 if [ "$menu" = "1" ]; then
 ip=4
@@ -88,7 +88,7 @@ ip=6
 ./cf -ips 6 -outfile 6.csv
 result
 elif [ "$menu" = "4" ]; then
-rm -rf 6.csv 4.csv location.json v4.txt v6.txt cf cf.sh
+rm -rf 6.csv 4.csv location.json ips-v4.txt ips-v6.txt cf cf.sh
 echo "已重置成功" && exit
 else
 exit
