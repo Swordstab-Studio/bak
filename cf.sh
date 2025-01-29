@@ -64,13 +64,13 @@ curl -L -o cf -# --retry 2 --insecure https://raw.githubusercontent.com/Swordsta
 chmod +x cf
 fi
 if [ ! -e location.json ]; then
-curl -s -o location.json https://raw.githubusercontent.com/Swordstab-Studio/bak//main/location.json
+curl -s -o location.json https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/location.json
 fi
 if [ ! -e ips-v4.txt ]; then
-curl -s -o ips-v4.txt https://raw.githubusercontent.com/Swordstab-Studio/bak//main/ips-v4.txt
+curl -s -o ips-v4.txt https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/ips-v4.txt
 fi
 if [ ! -e ips-v6.txt ]; then
-curl -s -o ips-v6.txt https://raw.githubusercontent.com/Swordstab-Studio/bak//main/ips-v6.txt
+curl -s -o ips-v6.txt https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/ips-v6.txt
 fi
 if [ "$menu" = "1" ]; then
 ip=4
