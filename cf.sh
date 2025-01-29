@@ -60,7 +60,7 @@ echo "4、重置配置文件"
 echo "5、退出"
 read -p "请选择【1-5】:" menu
 if [ ! -e cf ]; then
-curl -L -o cf -# --retry 2 --insecure https://raw.githubusercontent.com/Swordstab-Studio/bak/refs/heads/main/$cpu
+curl -L -o cf -# --retry 2 --insecure https://raw.githubusercontent.com/Swordstab-Studio/bak/main/$cpu
 chmod +x cf
 fi
 if [ ! -e location.json ]; then
